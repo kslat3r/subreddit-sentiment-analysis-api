@@ -1,0 +1,15 @@
+/api/subreddits
+/api/subreddits/{name}
+
+{
+    name: NAME,
+    dates: [
+        {
+            score: SCORE,
+            count: COUNT,
+            date: DATE,
+            created: CREATED,
+            updated: UPDATED
+        }
+    ]
+}
