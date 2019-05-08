@@ -1,0 +1,45 @@
+version: 2
+jobs:
+  deploy:
+    docker:
+      - image: google/cloud-sdk
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Setup deps
+          command: apt-get install -qq -y gettext
+      - run:
+          name: Setup Google Cloud SDK
+          command: |
+            echo $GOOGLE_SERVICE_KEY | gcloud auth activate-service-account --key-file=-
+            gcloud --quiet config set project subreddit-sentiment-analysis
+            gcloud --quiet config set compute/zone europe-west2-a
+            gcloud auth print-access-token | docker login -u oauth2accesstoken --password-stdin https://gcr.io
+            gcloud --quiet container clusters get-credentials ssanalysis
+      - run:
+          name: Add GCP credentials to checkout
+          command: echo ${GOOGLE_APPLICATION_CREDENTIALS} > ./env/gcp-credentials.json
+      - run:
+          name: Create Docker image
+          command: docker build -t subreddit-sentiment-analysis-api:${CIRCLE_SHA1} .
+      - run:
+          name: Push Docker image
+          command: |
+            docker tag subreddit-sentiment-analysis-api:${CIRCLE_SHA1} gcr.io/subreddit-sentiment-analysis-api/subreddit-sentiment-analysis-api:${CIRCLE_SHA1}
+            docker push gcr.io/subreddit-sentiment-analysis-api/subreddit-sentiment-analysis-api:${CIRCLE_SHA1}
+      - run:
+          name: Deploy to Kubernetes
+          command: |
+            envsubst < env/k8s/app.yml > /tmp/app.yml
+            kubectl apply -f /tmp/app.yml
+            kubectl rollout status -w deployment/subreddit-sentiment-analysis-api
+
+workflows:
+  version: 2
+  release:
+    jobs:
+      - deploy:
+          filters:
+            branches:
+              only: master

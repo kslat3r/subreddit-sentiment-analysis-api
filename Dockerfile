@@ -4,10 +4,6 @@ FROM node:12.1.0-alpine
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
-# Install
-
-RUN apk add python
-
 # Bundle app source
 COPY . /usr/src/app
 
