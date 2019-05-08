@@ -1,34 +1,40 @@
 const express = require('express')
 const router = express.Router()
 const createError = require('http-errors')
-const label = require('../lib/label')
+const dateMapper = require('../lib/date-mapper')
 
 module.exports = (db, logger) => {
   router.get('/subreddits/:name', async (req, res, next) => {
-    let rows
+    let subreddits
 
     try {
-      rows = await db.select('scores', ['*'], {
-        subreddit: req.params.name
-      }, null, 'updated', 'asc')
+      subreddits = await db.select('subreddits', ['*'], { name: req.params.name })
     } catch (e) {
       next(createError(500, e.message))
 
       return
     }
 
-    const out = {
-      name: req.params.name,
-      dates: rows.map(row => ({
-        score: row.score,
-        count: row.count,
-        label: label(row.created),
-        created: row.created,
-        updated: row.updated
-      }))
+    if (!subreddits.length) {
+      next(createError(404, 'Not found'))
+
+      return
     }
 
-    res.send(out)
+    const subreddit = subreddits[0]
+    let dates = []
+
+    try {
+      dates = await db.select('dailyScores', ['*'], { subredditId: subreddit.id }, 'DATE(created)', 'DESC')
+    } catch (e) {
+      next(createError(500, e.message))
+
+      return
+    }
+
+    subreddit.dates = dateMapper(dates)
+
+    res.send(subreddit)
   })
 
   return router
