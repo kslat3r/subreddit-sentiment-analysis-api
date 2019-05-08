@@ -34,7 +34,7 @@ spec:
         imagePullPolicy: Always
         env:
         - name: GOOGLE_APPLICATION_CREDENTIALS
-          value: "/usr/src/app/env/gcp-credentials.json"
+          value: "/usr/src/app/gcp-credentials.json"
         - name: DB_HOST
           valueFrom:
             secretKeyRef:

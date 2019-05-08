@@ -19,7 +19,7 @@ jobs:
             gcloud --quiet container clusters get-credentials ssanalysis
       - run:
           name: Add GCP credentials to checkout
-          command: echo ${GOOGLE_APPLICATION_CREDENTIALS} > ./env/gcp-credentials.json
+          command: echo ${GOOGLE_APPLICATION_CREDENTIALS} > ./gcp-credentials.json
       - run:
           name: Create Docker image
           command: docker build -t subreddit-sentiment-analysis-api:${CIRCLE_SHA1} .
@@ -31,7 +31,7 @@ jobs:
       - run:
           name: Deploy to Kubernetes
           command: |
-            envsubst < env/k8s/app.yml > /tmp/app.yml
+            envsubst < k8s/app.yml > /tmp/app.yml
             kubectl apply -f /tmp/app.yml
             kubectl rollout status -w deployment/subreddit-sentiment-analysis-api
 
