@@ -1,3 +1,5 @@
+process.env.TZ = 'UTC'
+
 const config = require('./config')
 const Logger = require('./lib/logger')
 const DB = require('./lib/db')
