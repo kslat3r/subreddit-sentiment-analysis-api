@@ -27,7 +27,7 @@ jobs:
           name: Push Docker image
           command: |
             docker tag subreddit-sentiment-analysis-api:${CIRCLE_SHA1} gcr.io/subreddit-sentiment-analysis-api/subreddit-sentiment-analysis-api:${CIRCLE_SHA1}
-            docker push gcr.io/subreddit-sentiment-analysis-api/subreddit-sentiment-analysis-api:${CIRCLE_SHA1}
+            docker push gcr.io/subreddit-sentiment-analysis/subreddit-sentiment-analysis-api:${CIRCLE_SHA1}
       - run:
           name: Deploy to Kubernetes
           command: |

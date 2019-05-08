@@ -30,7 +30,7 @@ spec:
     spec:
       containers:
       - name: subreddit-sentiment-analysis-api
-        image: gcr.io/subreddit-sentiment-analysis-api/subreddit-sentiment-analysis-api:${CIRCLE_SHA1}
+        image: gcr.io/subreddit-sentiment-analysis/subreddit-sentiment-analysis-api:${CIRCLE_SHA1}
         imagePullPolicy: Always
         env:
         - name: GOOGLE_APPLICATION_CREDENTIALS
