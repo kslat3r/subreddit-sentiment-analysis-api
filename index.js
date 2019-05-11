@@ -3,6 +3,7 @@ process.env.TZ = 'UTC'
 const config = require('./config')
 const Logger = require('./lib/logger')
 const DB = require('./lib/db')
+const Consumer = require('./lib/consumer')
 const express = require('express')
 const cors = require('cors')
 const expressWinston = require('express-winston')
@@ -14,7 +15,17 @@ const http = require('http')
 const logger = new Logger(config.logger)
 const db = new DB(config.db, logger)
 
-db.on('connection', () => {
+db.on('connection', async () => {
+  // setup consumer
+
+  const consumer = new Consumer(config.consumer, logger)
+
+  consumer.on('subredditInserted', (data) => console.log(data))
+  consumer.on('subredditUpdated', (data) => console.log(data))
+  consumer.on('averageComputed', (data) => console.log(data))
+
+  await consumer.start()
+
   // setup express
 
   const app = express()
