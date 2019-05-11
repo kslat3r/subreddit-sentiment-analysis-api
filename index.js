@@ -4,6 +4,7 @@ const config = require('./config')
 const Logger = require('./lib/logger')
 const DB = require('./lib/db')
 const express = require('express')
+const cors = require('cors')
 const expressWinston = require('express-winston')
 const subredditsRouter = require('./routes/subreddits')
 const subredditRouter = require('./routes/subreddit')
@@ -18,6 +19,7 @@ db.on('connection', () => {
 
   const app = express()
 
+  app.use(cors())
   app.use(expressWinston.logger({ winstonInstance: logger.adapter }))
   app.use(express.json())
   app.use(express.urlencoded({ extended: false }))
