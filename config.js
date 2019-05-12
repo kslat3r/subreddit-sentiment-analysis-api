@@ -3,9 +3,9 @@ module.exports = {
     level: process.env.LOG_LEVEL || 'debug'
   },
   db: {
-    host: process.env.DB_HOST || 'localhost',
+    host: process.env.DB_HOST || '35.197.206.176',
     user: process.env.DB_USER || 'ssanalysis',
-    password: process.env.DB_PASSWORD || 'S-mE{xVgn%h69}n!',
+    password: process.env.DB_PASSWORD || 'E5m2QFccpqqu',
     database: process.env.DB_NAME || 'ssanalysis'
   },
   consumer: {
