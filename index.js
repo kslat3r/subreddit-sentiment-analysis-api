@@ -11,21 +11,13 @@ const subredditsRouter = require('./routes/subreddits')
 const subredditRouter = require('./routes/subreddit')
 const createError = require('http-errors')
 const http = require('http')
+const socketIo = require('socket.io')
 
 const logger = new Logger(config.logger)
 const db = new DB(config.db, logger)
+const consumer = new Consumer(config.consumer, logger)
 
 db.on('connection', async () => {
-  // setup consumer
-
-  const consumer = new Consumer(config.consumer, logger)
-
-  consumer.on('subredditInserted', (data) => console.log(data))
-  consumer.on('subredditUpdated', (data) => console.log(data))
-  consumer.on('averageComputed', (data) => console.log(data))
-
-  await consumer.start()
-
   // setup express
 
   const app = express()
@@ -46,7 +38,7 @@ db.on('connection', async () => {
     res.send({ error: err.message })
   })
 
-  // serve
+  // server
 
   const port = process.env.PORT || 3000
   app.set('port', port)
@@ -81,6 +73,18 @@ db.on('connection', async () => {
 
     logger.debug('Listening on ' + bind)
   })
+
+  // socket
+
+  const io = socketIo(server)
+
+  io.on('connection', (socket) => {
+    consumer.on('subredditInserted', data => socket.emit('subredditInserted', data))
+    consumer.on('subredditUpdated', data => socket.emit('subredditUpdated', data))
+    consumer.on('averageComputed', data => socket.emit('averageComputed', data))
+  })
+
+  await consumer.start()
 })
 
 db.on('error', err => logger.error(err.message))
